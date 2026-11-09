@@ -3,6 +3,7 @@ import { GamesService } from '../games/games.service.js';
 import type { LeaderboardEntry } from '../leaderboard/leaderboard.types.js';
 import { LeaderboardService } from '../leaderboard/leaderboard.service.js';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { RealtimeService } from '../realtime/realtime.service.js';
 import type { SubmitScoreDto } from './dto/score.dto.js';
 
 export interface SubmittedScore {
@@ -32,6 +33,7 @@ export class ScoresService {
     private readonly prisma: PrismaService,
     private readonly games: GamesService,
     private readonly leaderboard: LeaderboardService,
+    private readonly realtime: RealtimeService,
   ) {}
 
   async submit(slug: string, dto: SubmitScoreDto): Promise<SubmitScoreResult> {
@@ -56,7 +58,11 @@ export class ScoresService {
       achievedAt: score.createdAt,
     });
     const rank = await this.leaderboard.rankForScore(game.id, best);
-    return { score, best, rank, isPersonalBest: stats?.matched === 0 };
+    const isPersonalBest = stats?.matched === 0;
+    if (isPersonalBest) {
+      await this.realtime.publishNewBest(game.id, game.slug, score.playerName);
+    }
+    return { score, best, rank, isPersonalBest };
   }
 
   async leaderboardOf(slug: string, limit: number): Promise<LeaderboardEntry[]> {

@@ -13,5 +13,4 @@ export function formatZodError(error: unknown): string[] {
 
 export const AppValidationPipe = createZodValidationPipe({
   createValidationException: (error) => new BadRequestException(formatZodError(error)),
-  strictSchemaDeclaration: true,
 });
