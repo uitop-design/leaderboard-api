@@ -1,5 +1,6 @@
 export default {
   testEnvironment: 'node',
+  restoreMocks: true,
   roots: ['<rootDir>/src'],
   testRegex: '.*\\.spec\\.ts$',
   extensionsToTreatAsEsm: ['.ts'],

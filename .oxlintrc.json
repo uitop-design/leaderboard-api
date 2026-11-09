@@ -11,7 +11,20 @@
     "no-console": "error",
     "eqeqeq": "error",
     "import/no-cycle": "error",
-    "typescript/no-extraneous-class": ["error", { "allowWithDecorator": true }]
+    "typescript/no-extraneous-class": [
+      "error",
+      {
+        "allowWithDecorator": true
+      }
+    ]
   },
-  "ignorePatterns": ["dist", "coverage", "node_modules", "src/generated"]
+  "ignorePatterns": ["dist", "coverage", "node_modules", "src/generated"],
+  "overrides": [
+    {
+      "files": ["**/*.spec.ts"],
+      "rules": {
+        "promise/valid-params": "off"
+      }
+    }
+  ]
 }
