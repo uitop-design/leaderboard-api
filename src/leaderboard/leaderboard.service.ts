@@ -15,7 +15,7 @@ export class LeaderboardService implements OnModuleInit {
   ) {}
 
   onModuleInit(): void {
-    this.redis.onReconnect(() => this.redisRanking.dropAll());
+    this.redis.onRecovery(() => this.redisRanking.dropAll());
   }
 
   async record(gameId: string, score: BestScore): Promise<void> {

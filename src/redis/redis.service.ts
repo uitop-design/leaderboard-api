@@ -2,13 +2,13 @@ import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { Redis } from 'ioredis';
 import { AppConfigService } from '../config/app-config.service.js';
 
-type ReconnectListener = () => void | Promise<void>;
+type RecoveryListener = () => void | Promise<void>;
 
 @Injectable()
 export class RedisService implements OnModuleDestroy {
   readonly client: Redis;
   private readonly logger = new Logger(RedisService.name);
-  private readonly reconnectListeners: ReconnectListener[] = [];
+  private readonly recoveryListeners: RecoveryListener[] = [];
   private connectedOnce = false;
   private down = false;
 
@@ -29,8 +29,8 @@ export class RedisService implements OnModuleDestroy {
     return this.client.status === 'ready';
   }
 
-  onReconnect(listener: ReconnectListener): void {
-    this.reconnectListeners.push(listener);
+  onRecovery(listener: RecoveryListener): void {
+    this.recoveryListeners.push(listener);
   }
 
   async ping(): Promise<boolean> {
@@ -46,17 +46,17 @@ export class RedisService implements OnModuleDestroy {
   }
 
   private handleReady(): void {
-    const reconnected = this.connectedOnce;
+    const recovered = this.down;
+    this.logger.log(this.connectedOnce ? 'Redis connection restored' : 'Redis connected');
     this.connectedOnce = true;
     this.down = false;
-    this.logger.log(reconnected ? 'Redis connection restored' : 'Redis connected');
-    if (!reconnected) {
+    if (!recovered) {
       return;
     }
-    for (const listener of this.reconnectListeners) {
+    for (const listener of this.recoveryListeners) {
       Promise.resolve()
         .then(listener)
-        .catch((error: unknown) => this.logger.error('Redis reconnect handler failed', error));
+        .catch((error: unknown) => this.logger.error('Redis recovery handler failed', error));
     }
   }
 
