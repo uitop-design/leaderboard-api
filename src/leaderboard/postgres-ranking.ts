@@ -41,18 +41,17 @@ export class PostgresRanking {
     return rows.map(({ rank, playerName, value }) => ({ rank, playerName, score: value }));
   }
 
-  async rankOf(gameId: string, playerName: string): Promise<number | null> {
-    const rows = await this.prisma.$queryRaw<{ rank: number }[]>`
-      WITH best AS (
-        SELECT lower(player_name) AS player, MAX(value) AS value
+  async rankForScore(gameId: string, value: number): Promise<number> {
+    const [row] = await this.prisma.$queryRaw<{ higher: number }[]>`
+      SELECT COUNT(*)::int AS higher
+      FROM (
+        SELECT 1
         FROM scores
         WHERE game_id = ${gameId}::uuid
         GROUP BY lower(player_name)
-      )
-      SELECT (SELECT COUNT(*) FROM best other WHERE other.value > me.value)::int + 1 AS rank
-      FROM best me
-      WHERE me.player = lower(${playerName})
+        HAVING MAX(value) > ${value}
+      ) AS better_players
     `;
-    return rows[0]?.rank ?? null;
+    return (row?.higher ?? 0) + 1;
   }
 }

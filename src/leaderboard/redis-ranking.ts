@@ -75,14 +75,9 @@ export class RedisRanking {
     return rankScores(scores, limit);
   }
 
-  async rankOf(gameId: string, playerName: string): Promise<number | null> {
+  async rankForScore(gameId: string, value: number): Promise<number> {
     await this.ensure(gameId);
-    const key = this.keys(gameId).scores;
-    const score = await this.redis.client.zscore(key, playerName.toLowerCase());
-    if (score === null) {
-      return null;
-    }
-    const higher = await this.redis.client.zcount(key, `(${score}`, '+inf');
+    const higher = await this.redis.client.zcount(this.keys(gameId).scores, `(${value}`, '+inf');
     return higher + 1;
   }
 

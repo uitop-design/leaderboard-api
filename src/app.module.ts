@@ -6,6 +6,7 @@ import { ConfigModule } from './config/config.module.js';
 import { GamesModule } from './games/games.module.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 import { RedisModule } from './redis/redis.module.js';
+import { ScoresModule } from './scores/scores.module.js';
 
 @Module({
   imports: [
@@ -13,7 +14,8 @@ import { RedisModule } from './redis/redis.module.js';
     PrismaModule,
     RedisModule,
     GamesModule,
-    RouterModule.register([{ path: 'api', children: [GamesModule] }]),
+    ScoresModule,
+    RouterModule.register([{ path: 'api', children: [GamesModule, ScoresModule] }]),
   ],
   providers: [
     { provide: APP_PIPE, useClass: AppValidationPipe },

@@ -38,13 +38,12 @@ export class LeaderboardService implements OnModuleInit {
     );
   }
 
-  async rankOf(gameId: string, playerName: string): Promise<number | null> {
-    const rank = await this.withFallback(
+  rankForScore(gameId: string, value: number): Promise<number> {
+    return this.withFallback(
       'read rank',
-      () => this.redisRanking.rankOf(gameId, playerName),
-      () => this.postgresRanking.rankOf(gameId, playerName),
+      () => this.redisRanking.rankForScore(gameId, value),
+      () => this.postgresRanking.rankForScore(gameId, value),
     );
-    return rank ?? this.postgresRanking.rankOf(gameId, playerName);
   }
 
   async drop(gameId: string): Promise<void> {
