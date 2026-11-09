@@ -4,6 +4,7 @@ import { AllExceptionsFilter } from './common/errors/all-exceptions.filter.js';
 import { AppValidationPipe } from './common/validation/zod-validation.pipe.js';
 import { ConfigModule } from './config/config.module.js';
 import { GamesModule } from './games/games.module.js';
+import { HealthModule } from './health/health.module.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 import { RedisModule } from './redis/redis.module.js';
 import { ScoresModule } from './scores/scores.module.js';
@@ -15,7 +16,8 @@ import { ScoresModule } from './scores/scores.module.js';
     RedisModule,
     GamesModule,
     ScoresModule,
-    RouterModule.register([{ path: 'api', children: [GamesModule, ScoresModule] }]),
+    HealthModule,
+    RouterModule.register([{ path: 'api', children: [GamesModule, ScoresModule, HealthModule] }]),
   ],
   providers: [
     { provide: APP_PIPE, useClass: AppValidationPipe },

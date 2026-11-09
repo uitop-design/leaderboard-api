@@ -6,7 +6,12 @@ import { PrismaClient } from '../generated/prisma/client.js';
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
   constructor(config: AppConfigService) {
-    super({ adapter: new PrismaPg({ connectionString: config.get('DATABASE_URL') }) });
+    super({
+      adapter: new PrismaPg({
+        connectionString: config.get('DATABASE_URL'),
+        connectionTimeoutMillis: 5000,
+      }),
+    });
   }
 
   async onModuleInit(): Promise<void> {

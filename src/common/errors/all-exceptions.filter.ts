@@ -1,4 +1,4 @@
-import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus, Logger } from '@nestjs/common';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException, Logger } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import type { Socket } from 'socket.io';
 import { buildErrorBody, ErrorBody } from './error-body.js';
@@ -31,7 +31,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
   private build(exception: unknown, path: string): ErrorBody {
     const body = buildErrorBody(exception, path);
-    if (body.statusCode >= HttpStatus.INTERNAL_SERVER_ERROR) {
+    if (!(exception instanceof HttpException) && body.statusCode >= 500) {
       this.logger.error(
         `Unhandled error on ${path}`,
         exception instanceof Error ? exception.stack : String(exception),
