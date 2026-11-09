@@ -11,6 +11,7 @@ export class RedisService implements OnModuleDestroy {
   private readonly recoveryListeners: RecoveryListener[] = [];
   private connectedOnce = false;
   private down = false;
+  private closing = false;
 
   constructor(config: AppConfigService) {
     this.client = new Redis(config.get('REDIS_URL'), {
@@ -42,6 +43,7 @@ export class RedisService implements OnModuleDestroy {
   }
 
   onModuleDestroy(): void {
+    this.closing = true;
     this.client.disconnect();
   }
 
@@ -61,7 +63,7 @@ export class RedisService implements OnModuleDestroy {
   }
 
   private markDown(reason: string): void {
-    if (this.down) {
+    if (this.down || this.closing) {
       return;
     }
     this.down = true;
